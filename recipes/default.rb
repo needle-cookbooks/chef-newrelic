@@ -17,6 +17,10 @@
 # limitations under the License.
 #
 
+
+data_bag_key = Chef::EncryptedDataBagItem.load_secret(node['data_bag_key'])
+secrets = Chef::EncryptedDataBagItem.load("secrets", node.chef_environment, data_bag_key)
+
 case node[:platform]
 when "ubuntu", "debian"
   include_recipe "newrelic::debian"
@@ -34,7 +38,7 @@ template "/etc/newrelic/nrsysmond.cfg" do
   owner "root"
   group "newrelic"
   mode "640"
-  variables( :license_key => node[:newrelic][:license_key],
+  variables( :license_key => secrets['newrelic']['license_key'],
              :hostname => node[:fqdn] )
   notifies( :restart, "service[newrelic-sysmond]" ) if node[:newrelic][:enabled]
 end
