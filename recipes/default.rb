@@ -17,9 +17,14 @@
 # limitations under the License.
 #
 
-
 data_bag_key = Chef::EncryptedDataBagItem.load_secret(node['data_bag_key'])
 secrets = Chef::EncryptedDataBagItem.load("secrets", node.chef_environment, data_bag_key)
+
+httparty = gem_package 'httparty' do
+  action :nothing
+end
+
+httparty.run_action(:install)
 
 case node[:platform]
 when "ubuntu", "debian"
